@@ -50,6 +50,7 @@ def get_net_profit_difference(file_path):
         res[day] = diff
 
     return res
+ 
 def get_output(profit_diff):
     '''
     Accepts a dict as argument.
