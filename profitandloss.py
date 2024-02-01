@@ -87,3 +87,96 @@ def get_trend(profit_diff):
         return "increase"
     else:
         return "decrease"
+
+def get_increasing_output(profit_diff):
+    '''
+    Accepts a dict as argument.
+    Return output for increasing trend.
+    '''
+    highest_day = 0
+    highest_increase = 0
+
+    for day, amt in profit_diff.items():
+        if amt > highest_increase:
+            highest_increase = amt
+            highest_day = day
+
+    output = "[NET PROFIT SURPLUS] NET PROFIT ON EACH DAY IS HIGHER THAN PREVIOUS DAY\n"
+    output += f"[HIGHEST NET PROFIT SURPLUS] DAY: {highest_day}, AMOUNT: SGD{highest_increase}\n"
+    
+    return output
+
+
+def get_decreasing_output(profit_diff):
+    '''
+    Accepts a dict as argument.
+    Return output for decreasing trend.
+    '''
+    lowest_day = 0
+    lowest_increase = 0
+
+    for day, amt in profit_diff.items():
+        if amt < lowest_increase:
+            lowest_increase = amt
+            lowest_day = day
+
+    output = "[NET PROFIT DEFICIT] NET PROFIT ON EACH DAY IS HIGHER THAN PREVIOUS DAY\n"
+    output += f"[HIGHEST PROFIT DEFICIT] DAY: {lowest_day}, AMOUNT: SGD{lowest_increase * -1}\n"
+    
+    return output
+
+
+def get_fluctuating_output(profit_diff):
+    '''
+    Accepts a dict as argument.
+    Return output for fluctuating trend.
+    '''
+    deficits = []  # Store days with deficits
+
+    output = ""
+    for day, amt in profit_diff.items():
+        if amt < 0:
+            deficits.append(day)  # Append days with deficit to list
+            output += f"[NET PROFIT DEFICIT] DAY: {day}, AMOUNT:  SGD{amt * -1}\n"
+
+    # Get top 3 highest deficits
+    top = [0, 0]
+    second = [0, 0]
+    third = [0, 0]
+
+    for day in deficits:
+        curr_deficit = profit_diff[day]  # Get deficit for current day
+        if curr_deficit < top[1]:  # If largest deficit
+            third = second
+            second = top
+            top = [day, curr_deficit]
+        elif curr_deficit < second[1]:  # If second largest
+            third = second
+            second = [day, curr_deficit]
+        elif curr_deficit < third[1]:  # If third largest
+            third = [day, curr_deficit]
+
+
+    top3_highest = [top, second, third]
+
+    for index, deficit in enumerate(top3_highest):
+        day = deficit[0]
+        amount = abs(deficit[1])  # Convert the deficit amount to a positive value
+
+        if index == 0:
+            output += f"[HIGHEST NET PROFIT DEFICIT] DAY: {day}, AMOUNT: SGD{amount}\n"
+        elif index == 1:
+            output += f"[2ND HIGHEST NET PROFIT DEFICIT] DAY: {day}, AMOUNT: SGD{amount}\n"
+        else:
+            output += f"[3RD HIGHEST NET PROFIT DEFICIT] DAY: {day}, AMOUNT: SGD{amount}\n"
+
+    return output
+
+# Main program
+FILEPATH = Path.cwd() / "csv_reports" / "Profit & Loss.csv"
+
+def profit_loss_function():
+    net_diff = get_net_profit_difference(FILEPATH)
+    output = get_output(net_diff)
+    with open('Summary_report.txt', 'a', encoding='utf-8') as f:
+        f.write(output)
