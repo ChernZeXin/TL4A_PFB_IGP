@@ -3,7 +3,7 @@ import csv
  # Read and process "Profit & Loss.csv" to calculate net profit differences
 def read_and_process_file():
     # Define the path to the CSV file
-    file_path = Path.cwd() / "csv_reports" / "Profit & Loss.csv"
+    file_path = Path.cwd() / "csv_reports" / "Profits_and_Loss.csv"
     # Open the CSV file and read its contents
     with file_path.open(mode="r", encoding="UTF-8", newline="") as file:
         reader = csv.reader(file)
@@ -174,7 +174,7 @@ def get_fluctuating_output(profit_diff):
     return output
 
 # Main program
-FILEPATH = Path.cwd() / "csv_reports" / "Profit & Loss.csv"
+FILEPATH = Path.cwd() / "csv_reports" / "Profits_and_Loss.csv"
 
 def profit_loss_function():
     net_diff = get_net_profit_difference(FILEPATH)
