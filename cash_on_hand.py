@@ -1,13 +1,45 @@
-import cash_on_hand
-import overheads
-import ProfitandLoss
+from pathlib import Path
+import csv
 
-def main():
-    overheads.overhead_function()
-    cash_on_hand.coh_function()
-    ProfitandLoss.profit_loss_function()
+# Function to read "Cash-On-Hand.csv" and parse contents into a list
+def read_and_process_file():
+    file_path = Path.cwd() / "csv_reports" / "Cash_on_Hand.csv"
+    with file_path.open(mode="r", encoding="UTF-8", newline="") as file:
+        reader = csv.reader(file)
+        next(reader)  # Skip header
+        # Extract the day and Cash on hand for each record
+        cash_on_hand = [[row[0], int(row[1])] for row in reader]  # Day and cash on hand
+    return cash_on_hand
 
-main()
+def get_COH_difference(file_path):
+    '''
+    Accepts file as input.
+    Return dict in the form of {day: cash on hand diff}
+    '''
+    cashonhand = []  # Store [day, cash on hand] for day 11-90
+    with open(file_path, encoding='utf-8') as f:
+        rows = f.readlines()[1:]  # Get rows of data excluding header
+        for row in rows:
+            row.rstrip("\n")
+            row = row.split(',')  # Split each row into a list
+
+            day = int(row[0])
+            COH = int(row[-1])
+
+            if not 11 <= day <= 90:
+                continue  # skip if day not in range
+            cashonhand.append([day, COH])
+    
+    res = {}
+    res[11] = 0  # Add day 11 first. Difference will be 0
+    
+    # Add remaining differences
+    for i in range(1, len(cashonhand)):
+        day = cashonhand[i][0]
+        diff = cashonhand[i][1] - cashonhand[i - 1][1]
+        res[day] = diff
+
+    return res
 
 def get_output(COH_diff):
     '''
@@ -125,7 +157,7 @@ def get_fluctuating_output(COH_diff):
     return output
 
 h: # Main program
-FILEPATH = Path.cwd() / "csv_reports" / "Cash-On-Hand.csv"
+FILEPATH = Path.cwd() / "csv_reports" / "Cash_on_Hand.csv"
 
 def coh_function():
     net_diff = get_COH_difference(FILEPATH)
